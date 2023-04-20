@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# 18
 function prepare_information() {
     HOSTNAME="HOSTNAME %-7s = $HOSTNAME"
 
