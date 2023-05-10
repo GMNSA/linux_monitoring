@@ -1,6 +1,54 @@
 #!/bin/bash
 
+default_column1_background=6
+default_column1_font_color=1
+default_column2_background=2
+default_column2_font_color=4
+
 is_error=0
+is_default=0
+
+. ./colors.conf
+
+function get_color_name() {
+    res=""
+    if [[ $1 -eq 1 ]]; then
+        res="white"
+    elif [[ $1 -eq 2 ]]; then
+        res="red"
+    elif [[ $1 -eq 3 ]]; then
+        res="green"
+    elif [[ $1 -eq 4 ]]; then
+        res="blue"
+    elif [[ $1 -eq 5 ]]; then
+        res="purple"
+    elif [[ $1 -eq 6 ]]; then
+        res="black"
+    fi
+
+    echo $res
+}
+
+# -------------------------------------------------------
+
+function print_information_color() {
+    echo -e ""
+
+    if [[ $is_default -eq 1 ]]; then
+        printf "Column 1 background = default ($(get_color_name ${default_column1_background}))\n"
+        printf "Column 1 font color = default ($(get_color_name ${default_column1_font_color}))\n"
+        printf "Column 1 background = default ($(get_color_name ${default_column2_background}))\n"
+        printf "Column 1 font color = default ($(get_color_name ${default_column2_font_color}))\n"
+    else
+        printf "Column 1 background = $column1_background ($(get_color_name ${column1_background}))\n"
+        printf "Column 1 font color = $column1_font_color ($(get_color_name ${column1_font_color}))\n"
+        printf "Column 1 background = $column2_background ($(get_color_name ${column2_background}))\n"
+        printf "Column 1 font color = $column2_font_color ($(get_color_name ${column2_font_color}))\n"
+    fi
+
+}
+
+# -------------------------------------------------------
 
 function get_color_font() {
     res=""
@@ -45,10 +93,18 @@ function get_color_background() {
 # -------------------------------------------------------
 
 function prepare_information() {
-    b_c_b=$(get_color_background "$1")  # f_c_b - font_color_before
-    f_c_b=$(get_color_font "$2")        # b_c_b - backgrond_color_before
-    b_c_a=$(get_color_background "$3")  # f_c_a - font_color_after
-    f_c_a=$(get_color_font "$4")        # b_c_a - backgrond_color_after
+    if [[ $is_default -eq 1 ]]; then
+        b_c_b=$(get_color_background "$default_column1_background")  # f_c_b - font_color_before
+        f_c_b=$(get_color_font "$default_column1_font_color")        # b_c_b - backgrond_color_before
+        b_c_a=$(get_color_background "$default_column2_background")  # f_c_a - font_color_after
+        f_c_a=$(get_color_font "$default_column2_font_color")        # b_c_a - backgrond_color_after
+    else
+        b_c_b=$(get_color_background "$column1_background")  # f_c_b - font_color_before
+        f_c_b=$(get_color_font "$column1_font_color")        # b_c_b - backgrond_color_before
+        b_c_a=$(get_color_background "$column2_background")  # f_c_a - font_color_after
+        f_c_a=$(get_color_font "$column2_font_color")        # b_c_a - backgrond_color_after
+    fi
+
     end="\033[0m" # end color stream
 
     before_hostname=${f_c_b}${b_c_b}${f_c_b}HOSTNAME${end}
@@ -135,39 +191,39 @@ function print_information() {
 
 function checking() {
     reg="^[0-9]+$"
-    var=($2 $3 $4 $5)
+    var=($column1_background $column1_font_color $column2_background $column2_font_color)
 
-    if [[ $1 -eq 4 ]]; then
+    if [[ ${#var[@]} -ne 4 ]] || [[ ${var[2]} == "" ]] ; then
+        is_default=1
+        var=(6 1 2 4)
+    fi
 
-        for i in ${!var[@]}; do
-            if [[ ${var[i]} =~ $reg ]] && [[ ${var[i]} -le 6 ]] && [[ ${var[i]} -ge 1 ]]; then
-                tmp=$(expr $i % 2)
-                if [[ $tmp -ne 0 ]]; then
-                    if [[ ${var[$((i - 1))]} -eq ${var[i]} ]]; then
-                        printf "$((i + "1")) \33[91mERROR \033[93mthe background color and font should be different - \33[91m[${var[$((i - 1))]} don't equal ${var[i]}]\033[0m\n"
-                        is_error=1
-                    else
-                        printf "$((i + "1")) \033[92mOK\033[0m\n"
-                    fi
+    for i in ${!var[@]}; do
+        if [[ ${var[i]} =~ $reg ]] && [[ ${var[i]} -le 6 ]] && [[ ${var[i]} -ge 1 ]]; then
+            tmp=$(expr $i % 2)
+            if [[ $tmp -ne 0 ]]; then
+                if [[ ${var[$((i - 1))]} -eq ${var[i]} ]]; then
+                    printf "$((i + "1")) \33[91mERROR \033[93mthe background color and font should be different - \33[91m[${var[$((i - 1))]} don't equal ${var[i]}]\033[0m\n"
+                    is_error=1
                 else
                     printf "$((i + "1")) \033[92mOK\033[0m\n"
                 fi
             else
-                printf "$((i + "1"))\33[91m FAIL \33[93m[${var[i]}] is not number or more than 6\033[0m\n"
-                is_error=1
+                printf "$((i + "1")) \033[92mOK\033[0m\n"
             fi
-        done
-    else
-        printf "\33[91mFAIL \33[93mCount arguments is not valid! \033[96m[example $0 1 2 3 4]\33[0m\n"
-        is_error=1
-    fi
+        else
+            printf "$((i + "1"))\33[91m FAIL \33[93m[${var[i]}] is not number or more than 6\033[0m\n"
+            is_error=1
+        fi
+    done
 }
 
 # -------------------------------------------------------
 
-checking "$#" "$1" "$2" "$3" "$4"
+checking
 
 if [[ $is_error -ne 1 ]]; then
-    prepare_information "$1" "$2" "$3" "$4"
+    prepare_information
     print_information
+    print_information_color
 fi
