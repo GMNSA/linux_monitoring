@@ -63,7 +63,7 @@ function get_color_font() {
     elif [[ $1 -eq 5 ]]; then
         res="\033[35m"
     elif [[ $1 -eq 6 ]]; then
-        res="\033[36m"
+        res="\033[30m"
     fi
 
     echo $res
@@ -84,7 +84,7 @@ function get_color_background() {
     elif [[ $1 -eq 5 ]]; then
         res="\033[45m"
     elif [[ $1 -eq 6 ]]; then
-        res="\033[46m"
+        res="\033[40m"
     fi
 
     echo $res
