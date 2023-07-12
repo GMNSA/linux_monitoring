@@ -1,6 +1,6 @@
 #!/bin/bash
 
-reg_express_numb="^([0-9]+?)[a-Z]+([0-9]+?)$"
+reg_express_numb="^[a-zA-Zа-яА-Я]+$"
 
 if [[ $# -eq 1 ]]; then
     if [[ $1 =~ $reg_express_numb ]]; then
