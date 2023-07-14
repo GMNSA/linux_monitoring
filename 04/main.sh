@@ -125,17 +125,20 @@ function prepare_information() {
     before_space_root_free=${f_c_b}${b_c_b}SPACE_ROOT_FREE${end}
 
     TIMEZONE="$(tr -d ' ' <<< "$(timedatectl | grep zone)")"
-    OS=$(hostnamectl | grep Operating)
+    OS=$(cat /etc/os-release  | grep NAME=\" | awk -F '=' 'NR==1 {print $2}' | awk -F '"' '{print $2}')
 
     after_hostname=${f_c_a}${b_c_a}${f_c_a}$HOSTNAME${end}
     after_timezone=${f_c_a}${b_c_a}${TIMEZONE:9}${end}
     after_user=${f_c_a}${b_c_a}$(whoami)${end}
-    after_os=${f_c_a}${b_c_a}${OS:18}${end}
+    after_os=${f_c_a}${b_c_a}${OS}${end}
     after_date=${f_c_a}${b_c_a}$(date "+%d %B %Y %H:%M:%S")${end}
     after_uptime=${f_c_a}${b_c_a}$(uptime -p)${end}
     after_uptime_sec=${f_c_a}${b_c_a}$(awk '{print $1}' /proc/uptime)${end}
-    after_ip=${f_c_a}${b_c_a}$(ip -br a | grep UP | awk '{print $3} ')${end}
-    after_mask=${f_c_a}${b_c_a}$(ip a | grep -A 4 UP | grep -E "inet " | grep brd | awk '{print $4}')${end}
+
+    after_ip=$(ip -br a | grep UP | awk 'NR==1 {print $3}')
+    after_mask=${f_c_a}${b_c_a}$(ipcalc "$after_ip" | awk '/Netmask/ {print $2}')${end}
+    after_ip=${f_c_a}${b_c_a}$(ip -br a | grep UP | awk 'NR==1 {print $3}' | awk -F '/' '{print $1}')${end}
+
     after_gateway=${f_c_a}${b_c_a}$(ip r | grep default | awk '{print $3}')${end}
     after_ram_total=${f_c_a}${b_c_a}$(free -m | grep Mem | awk '{printf "%.3f GB", $2/1024}')${end}
     after_ram_used=${f_c_a}${b_c_a}$(free -m | grep Mem | awk '{printf "%.3f GB", $3/1024}')${end}

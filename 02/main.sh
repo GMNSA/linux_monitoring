@@ -8,14 +8,16 @@ function prepare_information() {
 
     USER="USER %-11s = $(whoami)"
 
-    OS=$(hostnamectl | grep Operating)
-    OS="OS %-13s = ${OS:18}"
+    OS=$(cat /etc/os-release  | grep NAME=\" | awk -F '=' 'NR==1 {print $2}' | awk -F '"' '{print $2}')
+    OS="OS %-13s = ${OS}"
 
     DATE="DATE %-11s = $(date "+%d %B %Y %H:%M:%S")"
     UPTIME="UPTIME %-9s = $(uptime -p)"
     UPTIME_SEC="UPTIME_SEC %-5s = $(awk '{print $1}' /proc/uptime)"
-    IP="IP %-13s = $(ip -br a | grep UP | awk '{print $3} ')"
-    MASK="MASK %-11s = $(ip a | grep -A 4 UP | grep -E "inet " | grep brd | awk '{print $4}')"
+    IP="IP %-13s = $(ip -br a | grep UP | awk 'NR==1 {print $3}' | awk -F '/' '{print $1}')"
+    tmp_ip=$(ip -br a | grep UP | awk 'NR==1 {print $3}')
+    MASK="MASK %-11s = $(ipcalc "$tmp_ip" | awk '/Netmask/ {print $2}')"
+
     GATEWAY="GATEWAY %-8s = $(ip r | grep default | awk '{print $3}')"
     RAM_TOTAL="RAM_TOTAL %-6s = $(free -m | grep Mem | awk '{printf "%.3f GB", $2/1024}')"
     RAM_USED="RAM_USED %-7s = $(free -m | grep Mem | awk '{printf "%.3f GB", $3/1024}')"
