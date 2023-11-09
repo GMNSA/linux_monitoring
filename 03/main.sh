@@ -115,8 +115,6 @@ function prepare_information() {
 # -------------------------------------------------------
 
 function print_information() {
-    clear
-
     printf "$HOSTNAME\n"
     printf "$TIMEZONE\n"
     printf "$USER\n"
