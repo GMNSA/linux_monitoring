@@ -27,17 +27,17 @@
 There was a folder labeled "materials" underneath the article clippings in Mike's drawer. As you looked in it, you found several sheets describing the features of the bash scripts.
 
 
-## Part 1. Only letters.
+## Only letters.
 ![This is a alt text.](misc/1.png "only letters")
 
-## Part 2. Information about the system.
+## Information about the system.
 ![This is a alt text.](misc/2.png "Information about the system.")
 
-## Part 3. Information about the system in color.
+## Information about the system in color.
 ![This is a alt text.](misc/3.png "Information about the system in color.")
 
-## Part 4. Information about the system in color (config)
+## Information about the system in color (config)
 ![This is a alt text.](misc/4.png "Information about the system in color (config)")
 
-## Part 5. Information about the catalog.
+## Information about the catalog.
 ![This is a alt text.](misc/5.png "Information about the catalog.")
